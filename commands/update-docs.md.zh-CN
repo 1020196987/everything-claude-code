@@ -1,0 +1,145 @@
+# Update Documentation
+# 更新文档
+
+Sync documentation with the codebase, generating from source-of-truth files.
+将文档与代码库同步，从真实来源文件生成。
+
+## Step 1: Identify Sources of Truth
+## 步骤 1：识别真实来源
+
+| Source | Generates |
+|--------|-----------|
+| `package.json` scripts | Available commands reference |
+| `package.json` 脚本 | 可用命令参考 |
+| `.env.example` | Environment variable documentation |
+| `.env.example` | 环境变量文档 |
+| `openapi.yaml` / route files | API endpoint reference |
+| `openapi.yaml` / 路由文件 | API 端点参考 |
+| Source code exports | Public API documentation |
+| 源代码导出 | 公共 API 文档 |
+| `Dockerfile` / `docker-compose.yml` | Infrastructure setup docs |
+| `Dockerfile` / `docker-compose.yml` | 基础设施设置文档 |
+
+## Step 2: Generate Script Reference
+## 步骤 2：生成脚本参考
+
+1. Read `package.json` (or `Makefile`, `Cargo.toml`, `pyproject.toml`)
+1. 读取 `package.json`（或 `Makefile`、`Cargo.toml`、`pyproject.toml`）
+
+2. Extract all scripts/commands with their descriptions
+2. 提取所有脚本/命令及其描述
+
+3. Generate a reference table:
+3. 生成参考表：
+
+```markdown
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server with hot reload |
+| `npm run build` | Production build with type checking |
+| `npm test` | Run test suite with coverage |
+```
+
+## Step 3: Generate Environment Documentation
+## 步骤 3：生成环境文档
+
+1. Read `.env.example` (or `.env.template`, `.env.sample`)
+1. 读取 `.env.example`（或 `.env.template`、`.env.sample`）
+
+2. Extract all variables with their purposes
+2. 提取所有变量及其用途
+
+3. Categorize as required vs optional
+3. 分类为必需 vs 可选
+
+4. Document expected format and valid values
+4. 记录预期格式和有效值
+
+```markdown
+| Variable | Required | Description | Example |
+|----------|----------|-------------|---------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string | `postgres://user:pass@host:5432/db` |
+| `LOG_LEVEL` | No | Logging verbosity (default: info) | `debug`, `info`, `warn`, `error` |
+```
+
+## Step 4: Update Contributing Guide
+## 步骤 4：更新贡献指南
+
+Generate or update `docs/CONTRIBUTING.md` with:
+生成或更新 `docs/CONTRIBUTING.md`，包含：
+
+- Development environment setup (prerequisites, install steps)
+  开发环境设置（先决条件、安装步骤）
+
+- Available scripts and their purposes
+  可用脚本及其用途
+
+- Testing procedures (how to run, how to write new tests)
+  测试步骤（如何运行、如何编写新测试）
+
+- Code style enforcement (linter, formatter, pre-commit hooks)
+  代码风格强制执行（linter、formatter、pre-commit hooks）
+
+- PR submission checklist
+  PR 提交清单
+
+## Step 5: Update Runbook
+## 步骤 5：更新运行手册
+
+Generate or update `docs/RUNBOOK.md` with:
+生成或更新 `docs/RUNBOOK.md`，包含：
+
+- Deployment procedures (step-by-step)
+  部署步骤（逐步）
+
+- Health check endpoints and monitoring
+  健康检查端点和监控
+
+- Common issues and their fixes
+  常见问题及其修复
+
+- Rollback procedures
+  回滚步骤
+
+- Alerting and escalation paths
+  告警和升级路径
+
+## Step 6: Staleness Check
+## 步骤 6：过时检查
+
+1. Find documentation files not modified in 90+ days
+1. 查找 90+ 天未修改的文档文件
+
+2. Cross-reference with recent source code changes
+2. 与最近的源代码更改交叉引用
+
+3. Flag potentially outdated docs for manual review
+3. 标记可能过时的文档以供手动审查
+
+## Step 7: Show Summary
+## 步骤 7：显示摘要
+
+```
+Documentation Update
+──────────────────────────────
+Updated:  docs/CONTRIBUTING.md (scripts table)
+Updated:  docs/ENV.md (3 new variables)
+Flagged:  docs/DEPLOY.md (142 days stale)
+Skipped:  docs/API.md (no changes detected)
+──────────────────────────────
+```
+
+## Rules
+## 规则
+
+- **Single source of truth**: Always generate from code, never manually edit generated sections
+  **单一真实来源**：始终从代码生成，永远不手动编辑生成的部分
+
+- **Preserve manual sections**: Only update generated sections; leave hand-written prose intact
+  **保留手动部分**：仅更新生成的部分；保持手写散文完整
+
+- **Mark generated content**: Use `<!-- AUTO-GENERATED -->` markers around generated sections
+  **标记生成的内容**：在生成的部分周围使用 `<!-- AUTO-GENERATED -->` 标记
+
+- **Don't create docs unprompted**: Only create new doc files if the command explicitly requests it
+  **不要无提示创建文档**：仅在命令明确要求时才创建新的文档文件

@@ -1,0 +1,137 @@
+---
+description: Load the most recent session file from ~/.claude/sessions/ and resume work with full context from where the last session ended.
+description-zh: 从 ~/.claude/sessions/ 加载最新的会话文件，并从上次会话结束的地方恢复工作，并提供完整上下文。
+---
+
+# Resume Session Command
+# 恢复会话命令
+
+Load the last saved session state and orient fully before doing any work.
+This command is the counterpart to `/save-session`.
+加载最后保存的会话状态，并在做任何工作之前完全定位。
+此命令是 `/save-session` 的对应命令。
+
+## When to Use
+## 使用场景
+
+- Starting a new session to continue work from a previous day
+  开始新会话来继续之前一天的工作
+- After starting a fresh session due to context limits
+  由于上下文限制而开始新的会话后
+- When handing off a session file from another source
+  当从其他来源转入会话文件时
+- Any time you have a session file and want Claude to fully absorb it before proceeding
+  任何时候你有会话文件并希望 Claude 在继续之前完全吸收它
+
+## Usage
+## 使用方式
+
+```
+/resume-session                                                      # loads most recent file in ~/.claude/sessions/
+/resume-session 2024-01-15                                           # loads most recent session for that date
+/resume-session ~/.claude/sessions/2024-01-15-session.tmp           # loads a specific legacy-format file
+/resume-session ~/.claude/sessions/2024-01-15-abc123de-session.tmp  # loads a current short-id session file
+```
+
+## Process
+## 流程
+
+### Step 1: Find the session file
+### 步骤 1：找到会话文件
+
+If no argument provided:
+如果没有提供参数：
+1. Check `~/.claude/sessions/`
+   检查 `~/.claude/sessions/`
+2. Pick the most recently modified `*-session.tmp` file
+   选择最近修改的 `*-session.tmp` 文件
+3. If the folder does not exist or has no matching files, tell the user:
+   如果文件夹不存在或没有匹配的文件，告诉用户：
+
+   ```
+   No session files found in ~/.claude/sessions/
+   Run /save-session at the end of a session to create one.
+   ```
+
+If an argument is provided:
+如果提供了参数：
+- If it looks like a date (`YYYY-MM-DD`), search `~/.claude/sessions/` for files matching
+  `YYYY-MM-DD-session.tmp` (legacy format) or `YYYY-MM-DD-<shortid>-session.tmp` (current format)
+  and load the most recently modified variant for that date
+  如果看起来像日期（`YYYY-MM-DD`），搜索 `~/.claude/sessions/` 中匹配的文件
+- If it looks like a file path, read that file directly
+  如果看起来像文件路径，直接读取该文件
+- If not found, report clearly and stop
+  如果未找到，清楚报告并停止
+
+### Step 2: Read the entire session file
+### 步骤 2：读取整个会话文件
+
+Read the complete file. Do not summarize yet.
+读取完整文件。暂时不要总结。
+
+### Step 3: Confirm understanding
+### 步骤 3：确认理解
+
+Respond with a structured briefing in this exact format:
+用此确切格式回复结构化简报：
+
+```
+SESSION LOADED: [actual resolved path to the file]
+════════════════════════════════════════════════
+
+PROJECT: [project name / topic from file]
+
+WHAT WE'RE BUILDING:
+[2-3 sentence summary in your own words]
+
+CURRENT STATE:
+- Working: [count] items confirmed
+- In Progress: [list files that are in progress]
+- Not Started: [list planned but untouched]
+
+WHAT NOT TO RETRY:
+[list every failed approach with its reason]
+
+OPEN QUESTIONS / BLOCKERS:
+[list any blockers or unanswered questions]
+
+NEXT STEP:
+[exact next step if defined in the file]
+[if not defined: recommend reviewing 'What Has NOT Been Tried Yet']
+
+════════════════════════════════════════════════
+Ready to continue. What would you like to do?
+```
+
+### Step 4: Wait for the user
+### 步骤 4：等待用户
+
+Do NOT start working automatically. Do NOT touch any files. Wait for the user to say what to do next.
+不要自动开始工作。不要触碰任何文件。等待用户说要做什么。
+
+## Edge Cases
+## 边缘情况
+
+- **Multiple sessions for the same date**: Load the most recently modified matching file
+  **同一日期的多个会话**：加载最近修改的匹配文件
+- **Session file references files that no longer exist**: Note during briefing
+  **会话文件引用的文件不再存在**：在简报中注明
+- **Session file is from more than 7 days ago**: Note the gap and proceed normally
+  **会话文件超过 7 天前**：注明差距并正常继续
+- **User provides a file path directly**: Read and follow the same briefing process
+  **用户直接提供文件路径**：读取并遵循相同的简报流程
+- **Session file is empty or malformed**: Report clearly and stop
+  **会话文件为空或格式错误**：清楚报告并停止
+
+## Notes
+## 注意事项
+
+- Never modify the session file when loading it - it's a read-only historical record
+  加载时不要修改会话文件——它是只读的历史记录
+- The briefing format is fixed - do not skip sections even if they are empty
+  简报格式是固定的——即使部分为空也不要跳过
+- "What Not To Retry" must always be shown, even if it just says "None"
+  "不要重试什么"必须始终显示，即使只说"无"
+- After resuming, the user may want to run `/save-session` again at the end of the new session
+  恢复后，用户可能想在新的会话结束时再次运行 `/save-session`

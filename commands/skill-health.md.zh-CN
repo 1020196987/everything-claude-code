@@ -1,0 +1,78 @@
+---
+name: skill-health
+description: Show skill portfolio health dashboard with charts and analytics
+description-zh: 显示技能组合健康仪表板，包含图表和分析
+command: true
+---
+
+# Skill Health Dashboard
+# 技能健康仪表板
+
+Shows a comprehensive health dashboard for all skills in the portfolio with success rate sparklines, failure pattern clustering, pending amendments, and version history.
+显示组合中所有技能的综合健康仪表板，包含成功率迷你图、失败模式聚类、待处理修订和版本历史。
+
+## Implementation
+## 实现
+
+Run the skill health CLI in dashboard mode:
+在仪表板模式下运行技能健康 CLI：
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/scripts/skills-health.js" --dashboard
+```
+
+For a specific panel only:
+仅用于特定面板：
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/scripts/skills-health.js" --dashboard --panel failures
+```
+
+For machine-readable output:
+用于机器可读输出：
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/scripts/skills-health.js" --dashboard --json
+```
+
+## Usage
+## 使用方式
+
+```
+/skill-health                    # Full dashboard view
+/skill-health                    # 完整仪表板视图
+/skill-health --panel failures   # Only failure clustering panel
+/skill-health --panel failures   # 仅失败聚类面板
+/skill-health --json             # Machine-readable JSON output
+/skill-health --json             # 机器可读 JSON 输出
+```
+
+## What to Do
+## 做什么
+
+1. Run the skills-health.js script with --dashboard flag
+1. 用 --dashboard 标志运行 skills-health.js 脚本
+
+2. Display the output to the user
+2. 向用户显示输出
+
+3. If any skills are declining, highlight them and suggest running /evolve
+3. 如果任何技能在下降，突出显示它们并建议运行 /evolve
+
+4. If there are pending amendments, suggest reviewing them
+4. 如果有待处理的修订，建议审查它们
+
+## Panels
+## 面板
+
+- **Success Rate (30d)** — Sparkline charts showing daily success rates per skill
+  **成功率 (30d)** — 显示每个技能每日成功率的迷你图
+
+- **Failure Patterns** — Clustered failure reasons with horizontal bar chart
+  **失败模式** — 带有水平条形图的聚类失败原因
+
+- **Pending Amendments** — Amendment proposals awaiting review
+  **待处理修订** — 等待审查的修订提案
+
+- **Version History** — Timeline of version snapshots per skill
+  **版本历史** — 每个技能的版本快照时间线

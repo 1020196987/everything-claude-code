@@ -1,0 +1,127 @@
+---
+description: Safely identify and remove dead code with test verification at every step.
+description-zh: 安全地识别和删除死代码，并在每一步进行测试验证。
+---
+
+# Refactor Clean
+# 重构清理
+
+Safely identify and remove dead code with test verification at every step.
+安全地识别和删除死代码，并在每一步进行测试验证。
+
+## Step 1: Detect Dead Code
+## 步骤 1：检测死代码
+
+Run analysis tools based on project type:
+根据项目类型运行分析工具：
+
+| Tool | What It Finds | Command |
+|------|--------------|---------|
+| knip | Unused exports, files, dependencies | `npx knip` |
+| depcheck | Unused npm dependencies | `npx depcheck` |
+| ts-prune | Unused TypeScript exports | `npx ts-prune` |
+| vulture | Unused Python code | `vulture src/` |
+| deadcode | Unused Go code | `deadcode ./...` |
+| cargo-udeps | Unused Rust dependencies | `cargo +nightly udeps` |
+
+| 工具 | 找到的内容 | 命令 |
+|-----|---------|-----|
+| knip | 未使用的导出、文件、依赖 | `npx knip` |
+| depcheck | 未使用的 npm 依赖 | `npx depcheck` |
+| ts-prune | 未使用的 TypeScript 导出 | `npx ts-prune` |
+| vulture | 未使用的 Python 代码 | `vulture src/` |
+| deadcode | 未使用的 Go 代码 | `deadcode ./...` |
+| cargo-udeps | 未使用的 Rust 依赖 | `cargo +nightly udeps` |
+
+## Step 2: Categorize Findings
+## 步骤 2：分类发现
+
+Sort findings into safety tiers:
+将发现分类到安全层级：
+
+| Tier | Examples | Action |
+|------|----------|--------|
+| **SAFE** | Unused utilities, test helpers, internal functions | Delete with confidence |
+| **CAUTION** | Components, API routes, middleware | Verify no dynamic imports or external consumers |
+| **DANGER** | Config files, entry points, type definitions | Investigate before touching |
+
+| 层级 | 示例 | 行动 |
+|-----|-----|-----|
+| **安全** | 未使用的工具、测试辅助函数、内部函数 | 有信心地删除 |
+| **谨慎** | 组件、API 路由、中间件 | 验证无动态导入或外部消费者 |
+| **危险** | 配置文件、入口点、类型定义 | 处理前调查 |
+
+## Step 3: Safe Deletion Loop
+## 步骤 3：安全删除循环
+
+For each SAFE item:
+对于每个安全项目：
+
+1. **Run full test suite** - Establish baseline (all green)
+   **运行完整测试套件** - 建立基线（全部通过）
+2. **Delete the dead code** - Use Edit tool for surgical removal
+   **删除死代码** - 使用 Edit 工具精确删除
+3. **Re-run test suite** - Verify nothing broke
+   **重新运行测试套件** - 验证没有破坏任何东西
+4. **If tests fail** - Immediately revert with `git checkout -- <file>` and skip this item
+   **如果测试失败** - 立即用 `git checkout -- <file>` 恢复并跳过此项目
+5. **If tests pass** - Move to next item
+   **如果测试通过** - 继续下一个项目
+
+## Step 4: Handle CAUTION Items
+## 步骤 4：处理谨慎项目
+
+Before deleting CAUTION items:
+删除谨慎项目之前：
+- Search for dynamic imports: `import()`, `require()`, `__import__`
+  搜索动态导入：`import()`、`require()`、`__import__`
+- Search for string references: route names, component names in configs
+  搜索字符串引用：路由名称、配置中的组件名称
+- Check if exported from a public package API
+  检查是否从公共包 API 导出
+- Verify no external consumers (check dependents if published)
+  验证无外部消费者（如果已发布则检查依赖者）
+
+## Step 5: Consolidate Duplicates
+## 步骤 5：合并重复项
+
+After removing dead code, look for:
+删除死代码后，寻找：
+- Near-duplicate functions (>80% similar) - merge into one
+  近似重复函数（>80% 相似）- 合并为一个
+- Redundant type definitions - consolidate
+  冗余类型定义 - 合并
+- Wrapper functions that add no value - inline them
+  无价值的包装函数 - 内联它们
+- Re-exports that serve no purpose - remove indirection
+  无用的重导出 - 移除间接层
+
+## Step 6: Summary
+## 步骤 6：总结
+
+Report results:
+报告结果：
+
+```
+Dead Code Cleanup
+──────────────────────────────
+Deleted:   12 unused functions
+           3 unused files
+           5 unused dependencies
+Skipped:   2 items (tests failed)
+Saved:     ~450 lines removed
+──────────────────────────────
+All tests passing
+```
+
+## Rules
+## 规则
+
+- **Never delete without running tests first**
+  **先运行测试再删除**
+- **One deletion at a time** - Atomic changes make rollback easy
+  **一次删除一个** - 原子更改使回滚容易
+- **Skip if uncertain** - Better to keep dead code than break production
+  **不确定就跳过** - 保留死代码比破坏生产环境好
+- **Don't refactor while cleaning** - Separate concerns (clean first, refactor later)
+  **清理时不要重构** - 分离关注点（先清理，后重构）

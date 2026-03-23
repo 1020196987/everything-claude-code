@@ -1,0 +1,96 @@
+---
+name: evolve
+description: Analyze instincts and suggest or generate evolved structures
+command: true
+description-zh: 分析本能并建议或生成进化结构
+---
+
+# Evolve Command
+# Evolve 命令
+
+Analyzes instincts and clusters related ones into higher-level structures:
+分析本能并将相关的聚合成更高级别的结构：
+- **Commands**: When instincts describe user-invoked actions
+  **命令**：当本能描述用户调用的操作时
+- **Skills**: When instincts describe auto-triggered behaviors
+  **技能**：当本能描述自动触发的行为时
+- **Agents**: When instincts describe complex, multi-step processes
+  **代理**：当本能描述复杂的多步骤过程时
+
+## Usage
+## 使用方式
+
+```
+/evolve                    # Analyze all instincts and suggest evolutions
+/evolve --generate         # Also generate files under evolved/{skills,commands,agents}
+```
+
+```
+/evolve                    # 分析所有本能并建议进化
+/evolve --generate         # 同时在 evolved/{skills,commands,agents} 下生成文件
+```
+
+## Evolution Rules
+## 进化规则
+
+### Command (User-Invoked)
+### 命令（用户调用）
+
+When instincts describe actions a user would explicitly request:
+当本能描述用户明确请求的操作时：
+- Multiple instincts about "when user asks to..."
+  关于"当用户要求..."的多个本能
+- Instincts with triggers like "when creating a new X"
+  带触发器的本能，如"当创建新 X 时"
+- Instincts that follow a repeatable sequence
+  遵循可重复序列的本能
+
+### Skill (Auto-Triggered)
+### 技能（自动触发）
+
+When instincts describe behaviors that should happen automatically:
+当本能描述应该自动发生的行为时：
+- Pattern-matching triggers
+  模式匹配触发器
+- Error handling responses
+  错误处理响应
+- Code style enforcement
+  代码风格强制
+
+### Agent (Needs Depth/Isolation)
+### 代理（需要深度/隔离）
+
+When instincts describe complex, multi-step processes that benefit from isolation:
+当本能描述受益于隔离的复杂多步骤过程时：
+- Debugging workflows
+  调试工作流
+- Refactoring sequences
+  重构序列
+- Research tasks
+  研究任务
+
+## What to Do
+## 做什么
+
+1. Detect current project context
+   检测当前项目上下文
+2. Read project + global instincts (project takes precedence on ID conflicts)
+   读取项目 + 全局本能（项目在 ID 冲突时优先）
+3. Group instincts by trigger/domain patterns
+   按触发器/域模式分组本能
+4. Identify:
+   识别：
+   - Skill candidates (trigger clusters with 2+ instincts)
+     技能候选（2+ 本能的触发器集群）
+   - Command candidates (high-confidence workflow instincts)
+     命令候选（高置信度工作流本能）
+   - Agent candidates (larger, high-confidence clusters)
+     代理候选（更大、高置信度集群）
+5. Show promotion candidates (project -> global) when applicable
+   适用时显示升级候选（项目 -> 全局）
+6. If `--generate` is passed, write files to:
+   如果传递了 `--generate`，写入文件到：
+   - Project scope: `~/.claude/homunculus/projects/<project-id>/evolved/`
+     项目范围：`~/.claude/homunculus/projects/<project-id>/evolved/`
+   - Global fallback: `~/.claude/homunculus/evolved/`
+     全局回退：`~/.claude/homunculus/evolved/`
